@@ -1,0 +1,14 @@
+ship Number
+  matey ten
+    10
+  ends
+ends
+
+% ship TrueClass
+ %  matey !
+  %   false
+  % ends
+% ends
+
+rawr(5.ten)
+rawr(!true)

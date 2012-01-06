@@ -1,0 +1,5 @@
+ship John
+  matey shout
+    rawr("And a bottle of rum!")
+  ends
+ends

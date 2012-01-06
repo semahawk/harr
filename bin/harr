@@ -1,0 +1,75 @@
+#!/usr/bin/env ruby
+# encoding: utf-8
+
+# The Harr! programming language!
+#
+# usage:
+#   ./harr file.harr # to eval a file
+#   ./harr           # to start the REPL
+
+#$:.unshift '.' # fix for Ruby 1.9
+
+# Add the lib directory to $LOAD_PATH
+lib = File.expand_path(File.dirname(__FILE__) + '/../lib')
+$LOAD_PATH.unshift(lib) if File.directory?(lib) && !$LOAD_PATH.include?(lib)
+
+# Add the src directory to $LOAD_PATH
+src = File.expand_path(File.dirname(__FILE__) + '/../src')
+$LOAD_PATH.unshift(src) if File.directory?(src) && !$LOAD_PATH.include?(src)
+
+require "interpreter"
+require "readline"
+require "trollop"
+require "version"
+
+opts = Trollop::options do
+  banner <<-BANNER
+usage: harr file.harr     # to eval a file
+       harr               # to start console
+  
+  
+options:
+BANNER
+ 
+  version "Harr! version #{Version::STRING}"
+
+  opt :tokens, "Print tokens produced by lexer", :short => "-t"
+  opt :color, "Color the prompt", :short => "-c"
+  opt :eval, "Evaluate inline code", :short => "-e", :type => String
+end
+
+
+interpreter = Interpreter.new(opts[:tokens])
+
+# If a file is given:
+if file = ARGV.first
+  interpreter.eval File.read(file)
+elsif opts[:eval]
+  code = opts[:eval].dup
+  value = interpreter.eval code
+  puts "#=> #{value.ruby_value.inspect}"
+else # if not
+  puts "The interactive result-spitting beast for Harr! language."
+  puts "Type \"exit\" or \"quit\" to get yerself out of here.\n\n"
+
+    loop do
+      trap("INT") do
+        print "\nHarr!> "
+      end
+
+      unless opts[:color]
+        line = Readline::readline("Harr!> ")
+      else
+        line = Readline::readline("\e[0;34mHarr!> \e[0;0m")
+      end
+      exit if line =~ /quit/ or line =~ /exit/
+      Readline::HISTORY.push(line)
+      value = interpreter.eval(line)
+      unless opts[:color]
+        puts "=> #{value.ruby_value.inspect}"
+      else
+        puts "\e[0;35m=> \e[0;0m#{value.ruby_value.inspect}"
+      end
+    end
+end
+

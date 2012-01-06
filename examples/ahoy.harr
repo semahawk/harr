@@ -1,0 +1,15 @@
+% Requiring some ordinary file.
+loot("/home/szymon/Code/ruby/harr/examples/john.harr")
+
+% Doing some useless stuff.
+ship Jack
+  matey init
+    rawr("Ahoy!")
+  ends
+ends
+
+Jack.new.init
+% => Ahoy!
+
+John.new.shout
+% => And a bottle of rum!
